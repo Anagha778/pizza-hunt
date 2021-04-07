@@ -1,12 +1,17 @@
 const { Schema, model } = require('mongoose');
 const dateFormat = require('../utils/dateFormat');
+const assert = require('assert');
 
 const PizzaSchema = new Schema({
     pizzaName: {
-      type: String
+      type: String,
+      required: [true,'Pizza name mandatory'],
+      trim: true
     },
     createdBy: {
-      type: String
+      type: String,
+      required: [true,'Created by is mandatory'],
+      trim:true
     },
     createdAt: {
       type: Date,
@@ -15,6 +20,8 @@ const PizzaSchema = new Schema({
     },
     size: {
       type: String,
+      required:[true, 'Not valid size'],
+      enum: ['Personal', 'Small', 'Medium', 'Large', 'Extra Large'],
       default: 'Large'
     },
     toppings: [],
@@ -42,6 +49,18 @@ PizzaSchema.virtual('commentCount').get(function() {
 
 // create the Pizza model using the PizzaSchema
 const Pizza = model('Pizza', PizzaSchema);
+/*
+//error validation
+const badPizza = new Pizza({
+  pizzaName : null,
+  createdBy : null,
+  size : 'super large'
+});
+
+let error = badPizza.validateSync();
+assert.equal(error.errors['pizzaName'].message,'Pizza name mandatory');
+assert.equal(error.errors['createdBy'].message,'Created by is mandatory');
+assert.equal(error.errors['size'].message,'not valid size');*/
 
 // export the Pizza model
 module.exports = Pizza;
